@@ -23,24 +23,25 @@ class PHPStanTest extends AbstractTestCase
 
     public function testAnalysesWithoutErrors(): void
     {
-        if ($this->analyze(__DIR__.'/Fixture.php') === 0) {
-            $this->assertTrue(true);
-        }
+        $this->assertTrue($this->analyze(__DIR__.'/Fixture.php', $output));
     }
 
-    private function analyze(string $file)
+    private function analyze(string $file, array &$output = null): bool
     {
-        $output = shell_exec(implode(' ', [
-            implode(DIRECTORY_SEPARATOR, ['.', 'vendor', 'bin', 'phpstan']),
-            'analyse',
-            '--configuration='.escapeshellarg(realpath(__DIR__.'/../../extension.neon')),
-            '--no-progress',
-            '--no-interaction',
-            '--level=0',
-            escapeshellarg(realpath($file)),
-        ]));
-        var_dump($output);
+        exec(
+            implode(' ', [
+                implode(DIRECTORY_SEPARATOR, ['.', 'vendor', 'bin', 'phpstan']),
+                'analyse',
+                '--configuration='.escapeshellarg(realpath(__DIR__.'/../../extension.neon')),
+                '--no-progress',
+                '--no-interaction',
+                '--level=3',
+                escapeshellarg(realpath($file)),
+            ]),
+            $output,
+            $success
+        );
 
-        return $output;
+        return $success === 0;
     }
 }

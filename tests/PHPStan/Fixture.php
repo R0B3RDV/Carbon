@@ -6,19 +6,19 @@ namespace Tests\PHPStan;
 
 use Carbon\Carbon;
 
-Carbon::macro('foo', static function (): string {
-    return 'foo';
+Carbon::macro('phpStanMacro', static function (): string {
+    return 'phpStanMacro';
 });
 
 class Fixture
 {
     public function testCarbonMacroCalledStatically(): string
     {
-        return Carbon::foo();
+        return Carbon::phpStanMacro();
     }
 
     public function testCarbonMacroCalledDynamically(): string
     {
-        return Carbon::now()->foo();
+        return Carbon::now()->phpStanMacro();
     }
 }

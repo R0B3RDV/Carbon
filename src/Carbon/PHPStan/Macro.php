@@ -6,7 +6,6 @@ namespace Carbon\PHPStan;
 
 use Closure;
 use stdClass;
-use ErrorException;
 use ReflectionClass;
 use ReflectionFunction;
 use PHPStan\Reflection\Php\BuiltinMethodReflection;
@@ -64,15 +63,9 @@ final class Macro implements BuiltinMethodReflection
         $this->isStatic = false;
 
         if ($this->reflectionFunction->isClosure()) {
-            try {
-                /** @var Closure $closure */
-                $closure = $this->reflectionFunction->getClosure();
-                Closure::bind($closure, new stdClass);
-                // The closure can be bound so it was not explicitly marked as static
-            } catch (ErrorException $e) {
-                // The closure was explicitly marked as static
-                $this->isStatic = true;
-            }
+            /** @var Closure $closure */
+            $closure = $this->reflectionFunction->getClosure();
+            $this->isStatic = !@Closure::bind($closure, new stdClass);
         }
     }
 

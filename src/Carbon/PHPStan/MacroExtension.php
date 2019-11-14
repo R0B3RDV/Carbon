@@ -2,65 +2,78 @@
 
 namespace Carbon\PHPStan;
 
+use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use PHPStan\Broker\Broker;
-use PHPStan\Reflection\ClassReflection;
+use Closure;
+use PhpParser\Node\Expr\StaticCall;
+use PHPStan\Analyser\Scope;
 use PHPStan\Reflection\MethodReflection;
-use PHPStan\Reflection\BrokerAwareExtension;
-use PHPStan\Reflection\Php\PhpMethodReflectionFactory;
-use PHPStan\Reflection\MethodsClassReflectionExtension;
+use PHPStan\Type\BooleanType;
+use PHPStan\Type\DynamicStaticMethodReturnTypeExtension;
+use PHPStan\Type\MixedType;
+use PHPStan\Type\ObjectType;
+use PHPStan\Type\Type;
+use ReflectionClass;
 
-class MacroExtension implements MethodsClassReflectionExtension
+class MacroExtension implements DynamicStaticMethodReturnTypeExtension
 {
-    /**
-     * @var \PHPStan\Reflection\Php\PhpMethodReflectionFactory
-     */
-    protected $methodReflectionFactory;
-
-    /**
-     * Extension constructor.
-     *
-     * @param  \PHPStan\Reflection\Php\PhpMethodReflectionFactory  $methodReflectionFactory
-     */
-    public function __construct(PhpMethodReflectionFactory $methodReflectionFactory)
+    public function getTypeFromStaticMethodCall(MethodReflection $methodReflection, StaticCall $methodCall, Scope $scope): Type
     {
-        $this->methodReflectionFactory = $methodReflectionFactory;
+        $classReflection = $methodReflection->getDeclaringClass();
+        $className = $classReflection->getName();
+        $methodName = $methodReflection->getName();
+        var_dump($className, $methodName);
+        exit;
+
+        if (method_exists($className, $methodName)) {
+            return $methodCall->getType();
+        }
+
+        $reflectionClass = new ReflectionClass($className);
+        $property = $reflectionClass->getProperty('globalMacros');
+
+        return new BooleanType();
+
+        $property->setAccessible(true);
+        /** @var Closure $function */
+        $function = $property->getValue()[$methodName];
+        var_dump($function);
+        exit;
+
+        // return $function->;
+        $rawType = preg_replace('/\|null$/', '', $this->types[$methodReflection->getName()]);
+
+        switch ($rawType) {
+            case 'bool':
+                return new BooleanType();
+            case 'self':
+                return new ObjectType($this->getClass());
+        }
+
+        return new MixedType();
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasMethod(ClassReflection $classReflection, string $methodName): bool
+    public function isStaticMethodSupported(MethodReflection $methodReflection): bool
     {
+        $classReflection = $methodReflection->getDeclaringClass();
+        var_dump($classReflection->getName(), $methodReflection->getName());
+
         if (!in_array(
             CarbonInterface::class,
             $classReflection->getInterfaces()
         )) {
             /** @var CarbonInterface $class */
             $class = $classReflection->getName();
+            $name = $methodReflection->getName();
 
-            return $class::hasMacro($methodName);
+            return $class::hasMacro($name);
         }
 
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getMethod(ClassReflection $classReflection, string $methodName): MethodReflection
+    public function getClass(): string
     {
-        $className = $classReflection->getName();
-        $reflectionClass = new \ReflectionClass($className);
-        $property = $reflectionClass->getProperty('globalMacros');
-
-        $property->setAccessible(true);
-        $macro = $property->getValue()[$methodName];
-
-        return new Macro(
-            $classReflection->getName(),
-            $methodName,
-            new \ReflectionFunction($macro)
-        );
+        return CarbonInterface::class;
     }
 }
