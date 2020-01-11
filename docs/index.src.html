@@ -708,6 +708,9 @@ echo "\n";
         third-party libraries that could use Carbon. Nevertheless, to avoid calling <code>->locale()</code>
         each time, you can use factories.</p>
 
+    <p>When having a given instance, you can use the <code>->hasLocalTranslator()</code> to know if a custom
+        locale has been set for this date, else it means it uses the global locale.</p>
+
     <p>
     <pre class="live-editor"><code class="php">{{::lint(// Let say Martin from Paris and John from Chicago play chess
 $martinDateFactory = new Factory([
