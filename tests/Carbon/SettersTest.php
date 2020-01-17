@@ -726,4 +726,14 @@ class SettersTest extends AbstractTestCase
         $this->assertGreaterThan($minimum, $results['current']);
         $this->assertSame(static::SET_UNIT_NO_OVERFLOW_SAMPLE, $results['end'] + $results['start'] + $results['current']);
     }
+
+    public function testDateSet()
+    {
+        /** @var mixed $d */
+        $d = Carbon::parse('200-06-25 00:00:00');
+
+        $d->date = '1990-01-17 10:28:07';
+
+        $this->assertSame('1990-01-17 10:28:07', $d->format('Y-m-d h:i:s'));
+    }
 }

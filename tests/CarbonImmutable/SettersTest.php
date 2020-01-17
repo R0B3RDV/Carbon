@@ -409,4 +409,14 @@ class SettersTest extends AbstractTestCase
         $d->setMidDayAt(12);
         $this->assertSame(12, $d->getMidDayAt());
     }
+
+    public function testDateSet()
+    {
+        /** @var mixed $d */
+        $d = Carbon::parse('200-06-25 00:00:00');
+
+        $d->date = '1990-01-17 10:28:07';
+
+        $this->assertSame('1990-01-17 10:28:07', $d->format('Y-m-d h:i:s'));
+    }
 }

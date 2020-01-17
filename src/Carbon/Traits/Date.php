@@ -1155,6 +1155,11 @@ trait Date
 
                 break;
 
+            case 'date':
+                $this->modify($value);
+
+                break;
+
             default:
                 if (static::hasMacro($macro = 'set'.ucfirst($name))) {
                     $this->$macro($value);
