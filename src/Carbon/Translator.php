@@ -146,7 +146,7 @@ class Translator extends Translation\Translator
      *
      * @return string
      */
-    public function trans($id, array $parameters = [], $domain = null, $locale = null)
+    public function trans(?string $id, array $parameters = [], string $domain = null, string $locale = null)
     {
         if (null === $domain) {
             $domain = 'messages';
@@ -311,7 +311,7 @@ class Translator extends Translation\Translator
      *
      * @return bool
      */
-    public function setLocale($locale)
+    public function setLocale(string $locale)
     {
         $locale = preg_replace_callback('/[-_]([a-z]{2,})/', function ($matches) {
             // _2-letters or YUE is a region, _3+-letters is a variant
