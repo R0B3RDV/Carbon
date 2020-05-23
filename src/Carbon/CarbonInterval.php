@@ -248,6 +248,14 @@ class CarbonInterval extends DateInterval
     protected $tzName;
 
     /**
+     * The weeks number explicitly set by the $week parameter, fluent weeks() setter, ->weeks setter or
+     * week in string parsed format.
+     *
+     * @var int
+     */
+    private $explicitWeeks = 0;
+
+    /**
      * Set the instance's timezone from a string or object and add/subtract the offset difference.
      *
      * @param \DateTimeZone|string $tzName
@@ -349,6 +357,7 @@ class CarbonInterval extends DateInterval
             $spec .= $months > 0 ? $months.static::PERIOD_MONTHS : '';
 
             $specDays = 0;
+            $this->explicitWeeks = $weeks;
             $specDays += $weeks > 0 ? $weeks * static::getDaysPerWeek() : 0;
             $specDays += $days > 0 ? $days : 0;
 
